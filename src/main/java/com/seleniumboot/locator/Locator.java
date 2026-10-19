@@ -7,6 +7,7 @@ import com.seleniumboot.internal.SeleniumBootContext;
 import com.seleniumboot.metrics.ExecutionMetrics;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.StaleElementReferenceException;
@@ -427,6 +428,45 @@ public final class Locator {
     /** Appends text without clearing first. */
     public void append(String text) {
         whenVisible(el -> { el.sendKeys(text); return null; });
+    }
+
+    /**
+     * Waits for the element to be visible, then sends the given keys without clearing its value.
+     *
+     * <p>Keys are sent in order using {@link WebElement#sendKeys(CharSequence...)}.
+     * Re-resolves on every poll and retries stale or not-yet-present elements
+     * until {@code timeouts.explicit} elapses, including staleness while sending keys.
+     *
+     * <pre>getByLabel("Search").press(Keys.ENTER);</pre>
+     *
+     * @param keys Selenium keys to send to the element
+     * @throws LocatorException if no element matches within {@code timeouts.explicit}
+     * @throws TimeoutException if a matching element never becomes visible or remains stale
+     */
+    public void press(Keys... keys) {
+        whenVisible(el -> {
+            el.sendKeys(keys);
+            return null;
+        });
+    }
+
+    /**
+     * Waits for the element to be visible, then focuses it using JavaScript without clicking it.
+     *
+     * <p>The target must be focusable (for example, an input or an element with {@code tabindex}).
+     * Re-resolves on every poll and retries stale or not-yet-present elements
+     * until {@code timeouts.explicit} elapses, including staleness while focusing.
+     *
+     * <pre>getByLabel("Search").focus();</pre>
+     *
+     * @throws LocatorException if no element matches within {@code timeouts.explicit}
+     * @throws TimeoutException if a matching element never becomes visible or remains stale
+     */
+    public void focus() {
+        whenVisible(el -> {
+            ((JavascriptExecutor) driver()).executeScript("arguments[0].focus();", el);
+            return null;
+        });
     }
 
     /**
