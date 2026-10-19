@@ -348,6 +348,42 @@ public final class Locator {
     }
 
     /**
+     * Waits for the element to be visible and enabled, then double-clicks it.
+     *
+     * <p>Re-resolves on every poll and retries stale or not-yet-present elements
+     * until {@code timeouts.explicit} elapses, including staleness during the gesture.
+     *
+     * <pre>getByText("Edit item").doubleClick();</pre>
+     *
+     * @throws LocatorException if no element matches within {@code timeouts.explicit}
+     * @throws TimeoutException if a matching element never becomes ready or remains stale
+     */
+    public void doubleClick() {
+        whenReady(el -> el.isDisplayed() && el.isEnabled(), el -> {
+            new Actions(driver()).doubleClick(el).perform();
+            return null;
+        });
+    }
+
+    /**
+     * Waits for the element to be visible, then right-clicks it (context click).
+     *
+     * <p>Re-resolves on every poll and retries stale or not-yet-present elements
+     * until {@code timeouts.explicit} elapses, including staleness during the gesture.
+     *
+     * <pre>getByText("Options").rightClick();</pre>
+     *
+     * @throws LocatorException if no element matches within {@code timeouts.explicit}
+     * @throws TimeoutException if a matching element never becomes visible or remains stale
+     */
+    public void rightClick() {
+        whenVisible(el -> {
+            new Actions(driver()).contextClick(el).perform();
+            return null;
+        });
+    }
+
+    /**
      * Waits for the element to be visible and enabled, then checks it if it is not already checked.
      *
      * <p>Idempotent: does not click if the element is already checked. Works on checkboxes,
