@@ -9,6 +9,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
@@ -31,6 +32,7 @@ import static org.testng.Assert.*;
 public class LocatorActionsTest {
 
     private static final By TARGET = By.id("target");
+    private static final String FOCUS_SCRIPT = "arguments[0].focus();";
 
     private WebDriver driver;
     private JavascriptExecutor js;
@@ -62,7 +64,7 @@ public class LocatorActionsTest {
 
     @DataProvider(name = "actions")
     public Object[][] actions() {
-        return new Object[][] {{"doubleClick"}, {"rightClick"}};
+        return new Object[][] {{"press"}, {"focus"}, {"doubleClick"}, {"rightClick"}};
     }
 
     @Test(dataProvider = "actions")
@@ -165,6 +167,7 @@ public class LocatorActionsTest {
 
         expectThrows(TimeoutException.class, () -> act(action));
 
+        verify(hidden, never()).sendKeys(any(Keys[].class));
         verify(js, never()).executeScript(anyString(), any(WebElement.class));
         verify(interactive, never()).perform(any());
         verify(driver, atLeast(2)).findElements(TARGET);
@@ -192,6 +195,8 @@ public class LocatorActionsTest {
     private void act(String action) {
         Locator locator = Locator.of(TARGET);
         switch (action) {
+            case "press" -> locator.press(Keys.ENTER, Keys.ESCAPE);
+            case "focus" -> locator.focus();
             case "doubleClick" -> locator.doubleClick();
             case "rightClick" -> locator.rightClick();
             default -> throw new IllegalArgumentException(action);
@@ -205,6 +210,8 @@ public class LocatorActionsTest {
     private void failActionWithStale(String action, WebElement element, boolean always) {
         StaleElementReferenceException error = new StaleElementReferenceException("re-rendered during action");
         switch (action) {
+            case "press" -> doThrow(error).when(element).sendKeys(Keys.ENTER, Keys.ESCAPE);
+            case "focus" -> when(js.executeScript(FOCUS_SCRIPT, element)).thenThrow(error);
             case "doubleClick", "rightClick" -> {
                 if (always) {
                     doThrow(error).when(interactive).perform(any());
@@ -218,6 +225,8 @@ public class LocatorActionsTest {
 
     private void verifySuccessfulAction(String action, WebElement element, int gestureAttempts) {
         switch (action) {
+            case "press" -> verify(element, times(1)).sendKeys(Keys.ENTER, Keys.ESCAPE);
+            case "focus" -> verify(js, times(1)).executeScript(FOCUS_SCRIPT, element);
             case "doubleClick", "rightClick" -> {
                 ArgumentCaptor<Collection<Sequence>> gestures = ArgumentCaptor.captor();
                 verify(interactive, times(gestureAttempts)).perform(gestures.capture());
