@@ -11,6 +11,8 @@ All notable changes to Selenium Boot are documented here.
 
 ## [Unreleased]
 
+- **`Locator` keyboard and pointer actions: `press(Keys...)`, `focus()`, `doubleClick()`, `rightClick()`** — send keys without clearing the value, focus without clicking, or perform native double/context clicks directly on a locator. Each action re-resolves on every poll and retries stale or not-yet-present elements until `timeouts.explicit` elapses. (#134)
+
 - **AI provider is configurable** — `ai.provider` selects the backend for failure analysis and the run summary: `anthropic` (default, unchanged), `gemini`, or `openai` (any OpenAI-compatible `/chat/completions` endpoint — OpenAI, Azure, Groq, local Ollama via `ai.baseUrl`). `ai.model` now defaults per provider. Existing configs keep working with no change.
 
 - **AI run summary (opt-in)** — `ai.runSummary: true` adds one short paragraph to the HTML dashboard summarising the run's failures: which same-cause groups account for most of them, which look like product bugs versus test or environment problems, and what to check first. One API call per run, independent of `ai.failureAnalysis`; only grouped error messages and test names are sent (see the data note in the HTML report docs). Absent when disabled, when nothing failed, or on any error; the suite result is never affected. The text is exported as `aiRunSummary` in the metrics JSON.

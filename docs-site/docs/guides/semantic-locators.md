@@ -24,6 +24,8 @@ Every semantic locator returns the same chainable, **auto-waiting** `Locator`
 used by the `$()` API — no `Thread.sleep`, no explicit waits. They're available
 on both `BaseTest` and `BasePage`. Narrow multiple matches using `.first()`, `.last()`, or `.nth(index)` (e.g. `getByRole(Role.LISTITEM).first().click()`).
 
+Use `press(org.openqa.selenium.Keys...)` (e.g. `getByLabel("Search").press(Keys.ENTER)`, with `import org.openqa.selenium.Keys;`) to send keys without clearing, `focus()` to focus a focusable element without clicking, and `doubleClick()` / `rightClick()` for native pointer gestures; all four auto-wait and re-resolve on each poll up to `timeouts.explicit`.
+
 Assertions can retry focus and empty-state checks, and accept regular expressions for text and values: `assertThat(getByLabel("Email")).isFocused()`, `isEmpty()`, or `hasValue(Pattern.compile("user-\\d+"))`.
 
 Auto-waiting covers the element *existing* as well as being visible: an action such as `click()` or
