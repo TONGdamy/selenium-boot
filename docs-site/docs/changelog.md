@@ -11,6 +11,8 @@ All notable changes to Selenium Boot are documented here.
 
 ## [Unreleased]
 
+- **`Locator` keyboard and pointer actions: `press(Keys...)`, `focus()`, `doubleClick()`, `rightClick()`** — send keys without clearing the value, focus without clicking, or perform native double/context clicks directly on a locator. Each action re-resolves on every poll and retries stale or not-yet-present elements until `timeouts.explicit` elapses. (#134)
+
 - **Failure Intelligence: high-level triage and suggested actions** — each failure is classified as `Product bug`, `Test bug`, `Environment`, `Flaky` or `Unknown` (flaky keeps its cause, e.g. `Flaky (Locator not found)`), with a rule-based suggested action. Shown in the HTML report, as `failureType` / `suggestedAction` in the metrics JSON, and in the JUnit XML; opt-in AI analysis uses it as a baseline. No API key needed. (#138)
 
 - **HTML report: tab and failure fixes** — the report always opens on the Dashboard (it no longer restores the last-open tab), failure details start collapsed, and the Failures tab no longer goes empty after you expand or collapse a class in Test Cases (both tabs shared one group id).
